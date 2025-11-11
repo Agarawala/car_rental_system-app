@@ -84,12 +84,17 @@ app.get("/bookings/:userId/:bookingId", (req, res) => {
   }
 
   res.json({
-    msg: "something went wrong",
+    msg: "booking not found",
   });
 });
 
+
 app.put("/bookings/:userId/:bookingsId/:status", (req, res) => {
   const { userId, bookingId, status } = req.params;
+
+//   const user = users.find((user) => user.userId == userId)
+//   const bookinguser = user["bookings"].find((bookinguser) =>//  )
+  
   for (let i = 0; i < users.length; i++) {
     if (userId == users[i]["userId"]) {
       for (let j = 0; j < users[i]["bookings"].length; j++) {
@@ -108,18 +113,19 @@ app.put("/bookings/:userId/:bookingsId/:status", (req, res) => {
   });
 });
 
-app.delete("bookings/:userId/:bookingId", () => {
+app.delete("/bookings/:userId/:bookingId", (req,res) => {
+
   const { userId, bookingId } = req.params;
   let newarr = [];
 
   for (let i = 0; i < users.length; i++) {
     if (userId == users[i]["userId"]) {
-      for (let j = 0; j < users[i]["booking"].length; j++) {
+      for (let j = 0; j < users[i]["bookings"].length; j++) {
         if (users[i]["bookings"][j]["bookingId"] != bookingId) {
-          newarr.push(users[i]["booking"][j]);
+          newarr.push(users[i]["bookings"][j]);
         }
       }
-      users[i]["booking"] = newarr;
+      users[i]["bookings"] = newarr;
       return res.json({
         msg: "done!",
       });
@@ -132,6 +138,7 @@ app.delete("bookings/:userId/:bookingId", () => {
 });
 
 app.get("/summary/:userId", (req, res) => {
+    
   const userId = req.params.userId;
 
   for (let i = 0; i < users.length; i++) {
