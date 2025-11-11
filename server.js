@@ -29,7 +29,7 @@ app.get("/users", (req, res) => {
 
 let cnt2 = 100;
 app.post("/bookings/:userId", (req, res) => {
-  const { carName, days, rentPerDay } = res.body;
+  const { carName, days, rentPerDay } = req.body;
 
   for (let i = 0; i < users.length; i++) {
     if (req.params.userId == users[i]["userId"]) {
@@ -38,7 +38,7 @@ app.post("/bookings/:userId", (req, res) => {
         carName,
         days,
         rentPerDay,
-        satus: "booked",
+        status: "booked",
       });
 
       return res.status(201)({
@@ -70,6 +70,7 @@ app.get("/bookings/:userId", (req, res) => {
 
 app.get("/bookings/:userId/:bookingId", (req, res) => {
   const { userId, bookingId } = req.params;
+
   for (let i = 0; i < users.length; i++) {
     if (userId == users[i]["userId"]) {
       for (let j = 0; j < users[i]["bookings"].length; j++) {
@@ -81,6 +82,10 @@ app.get("/bookings/:userId/:bookingId", (req, res) => {
       }
     }
   }
+
+  res.json({
+    msg: "something went wrong",
+  });
 });
 
 app.put("/bookings/:userId/:bookingsId/:status", (req, res) => {
@@ -103,7 +108,28 @@ app.put("/bookings/:userId/:bookingsId/:status", (req, res) => {
   });
 });
 
-app.delete("bookings/:userId/:bookingId", () => {});
+app.delete("bookings/:userId/:bookingId", () => {
+  const { userId, bookingId } = req.params;
+  let newarr = [];
+
+  for (let i = 0; i < users.length; i++) {
+    if (userId == users[i]["userId"]) {
+      for (let j = 0; j < users[i]["booking"].length; j++) {
+        if (users[i]["bookings"][j]["bookingId"] != bookingId) {
+          newarr.push(users[i]["booking"][j]);
+        }
+      }
+      users[i]["booking"] = newarr;
+      return res.json({
+        msg: "done!",
+      });
+    }
+  }
+
+  res.json({
+    msg: "something went wrong",
+  });
+});
 
 app.get("/summary/:userId", (req, res) => {
   const userId = req.params.userId;
@@ -114,9 +140,12 @@ app.get("/summary/:userId", (req, res) => {
       for (let j = 0; j < users[i]["bookings"].length; j++) {
         if (
           users[i]["bookings"][j]["status"] == "booked" ||
-          users[i]["bookings"][j]["status"] == "complted"
+          users[i]["bookings"][j]["status"] == "completed"
         ) {
-          ans =  ans + users[i]["bookings"][j]["days"] * users[i]["bookings"][j]["rentPerDay"];
+          ans =
+            ans +
+            users[i]["bookings"][j]["days"] *
+              users[i]["bookings"][j]["rentPerDay"];
         }
       }
 
